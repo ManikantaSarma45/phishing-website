@@ -5,11 +5,15 @@ from sklearn.preprocessing import StandardScaler
 
 # from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
+import os
+
+DATA_PATH = os.path.join("backend", "data")
+MODEL_PATH = os.path.join("backend", "models")
 
 
 class TrainModel:
     def __init__(self):
-        self.df = pd.read_csv("../datasets/final_merged_dataset.csv")
+        self.df = pd.read_csv(f"{DATA_PATH}/final_merged_dataset.csv")
         self.df = self.df.drop_duplicates()
         self.X_train = None
         self.X_test = None
@@ -34,11 +38,11 @@ class TrainModel:
 
     def train_model(self):
         self.data_preprocess()
-        self.model = XGBClassifier(max_depth=10)
+        self.model = XGBClassifier(max_depth=12)
         self.model.fit(self.X_train, self.y_train)
 
-        with open("model_v1.pkl", "wb") as f:
+        with open(f"{MODEL_PATH}/model_v1.pkl", "wb") as f:
             pickle.dump(self.model, f)
 
-        with open("scaler_v1.pkl", "wb") as f:
+        with open(f"{MODEL_PATH}/scaler_v1.pkl", "wb") as f:
             pickle.dump(self.scaler, f)

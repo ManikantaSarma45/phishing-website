@@ -2,7 +2,8 @@
 # from features import FeatureExtraction
 # from train import TrainModel
 # from predict import Predict
-from src import preprocess, features, predict
+from backend.src import predict, evaluate, train
+from backend.src.utils import logger
 
 
 class Pipeline:
@@ -10,16 +11,21 @@ class Pipeline:
         self.url = url
 
     def create_pipeline(self):
-        # print(f"\n{self.url}")
-        pp = preprocess.Preprocessing()
-        fe = features.FeatureExtraction()
-        # t = TrainModel()
+        logger.info(f"Sample URL: {self.url}")
+        t = train.TrainModel()
+        e = evaluate.Evaluate()
         p = predict.Predict()
-        preprocessed_url = pp.preprocess(self.url)
-        # print(url)
-        url_features = fe.extract_features(preprocessed_url)
-        # print(features)
-        # t.train_model()
-        prediction = p.predict(url_features)
+
+        # url_features = fe.extract_features(self.url)
+        # print(url_features)
+        t.train_model()
+        e.evaluate_model()
+        prediction = p.predict(self.url)
         return prediction
         # print(prediction)
+
+
+if __name__ == "__main__":
+    pl = Pipeline()
+    pl.set_url(url="www.google.com")
+    pl.create_pipeline()

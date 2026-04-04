@@ -101,8 +101,9 @@ http://localhost:8000/docs
 ## Machine Learning Pipeline
 Run the complete pipeline
 ```bash
-python backend/pipeline/pipeline.py
+python -m backend.pipeline.pipeline
 ```
+The model is trained and stored as `.pkl` files in `/backend/data` directory. The model evaluation and URL prediction results are logged in `/backend/logs/app.log` file.
 
 ## Logging
 Logs are stored in

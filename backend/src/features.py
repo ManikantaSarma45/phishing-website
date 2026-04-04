@@ -13,7 +13,9 @@ import requests
 import socket
 import ssl
 import whois
-DATAPATH= os.path.join("backend", "data")
+
+DATA_PATH = os.path.join("backend", "data")
+
 
 class FeatureExtraction:
     def __init__(self):
@@ -22,9 +24,9 @@ class FeatureExtraction:
         self.extracted = None
         self.creation_dt = None
         self.expiry_dt = None
-        self.url_shorteners = set(pd.read_csv(f"{DATAPATH}/url_shorteners.csv").url)
+        self.url_shorteners = set(pd.read_csv(f"{DATA_PATH}/url_shorteners.csv").url)
         self.hosting_websites = set(
-            pd.read_csv(f"{DATAPATH}/hosting_websites.csv").domain
+            pd.read_csv(f"{DATA_PATH}/hosting_websites.csv").domain
         )
         self.top_1m_domains = set(
             Tranco(cache=True, cache_dir=".tranco").list().top(1000000)
