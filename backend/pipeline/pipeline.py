@@ -4,6 +4,7 @@
 # from predict import Predict
 from src import preprocess, features, predict
 
+
 class Pipeline:
     def set_url(self, url: str):
         self.url = url
@@ -16,9 +17,9 @@ class Pipeline:
         p = predict.Predict()
         preprocessed_url = pp.preprocess(self.url)
         # print(url)
-        features = fe.extract_features(preprocessed_url)
+        url_features = fe.extract_features(preprocessed_url)
         # print(features)
         # t.train_model()
-        prediction = p.predict(features)
+        prediction = p.predict(url_features)
         return prediction
         # print(prediction)

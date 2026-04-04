@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schema import URLInput
 from backend.src.predict import Predict
+from backend.src.utils import logger
 
 # create app
 app = FastAPI()
@@ -15,17 +16,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # root endpoint
 @app.get("/")
 def home():
     return {"message": "Phishing Detection API is running"}
 
+
 # prediction endpoint
 @app.post("/predict")
 def predict(data: URLInput):
-    result = int(Predict().predict(data.url))
+    try:
+        logger.info(f"Received URL: {data.url}")
+        result = int(Predict().predict(data.url))
+        logger.info(f"Prediction Results: {result}")
 
-    return {
-        "url": data.url,
-        "prediction": result
-    }
+        return {"url": data.url, "prediction": result}
+
+    except Exception as e:
+        logger.error(f"Error: {str(e)}")
+        return {"error": str(e)}

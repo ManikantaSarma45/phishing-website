@@ -3,9 +3,8 @@ __pycache__/
 backend/src/__pycache__/
 backend/app/__pycache__/
 *.pyc
-*.pkl
-logs/
+backend/logs/app.log
 .env
 .DS_Store
 .tranco/
-.github/
+libomp.tar.xz

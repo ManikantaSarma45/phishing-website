@@ -4,7 +4,7 @@ import os
 from backend.src.features import FeatureExtraction
 
 MODEL_PATH = os.path.join("backend", "models", "model_v1.pkl")
-SCALER_PATH = os.path.join("backend", "models", "scaler.pkl")
+SCALER_PATH = os.path.join("backend", "models", "scaler_v1.pkl")
 
 
 class Predict:

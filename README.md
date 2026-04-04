@@ -12,6 +12,7 @@ This project implements a machine learning-based system to detect phishing websi
 - CI/CD pipeline using GitHub Actions
 
 ## Project Structure
+```
 phishing-website/
 │
 ├── backend/
@@ -26,62 +27,88 @@ phishing-website/
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
+```
 
 ## Installation
 Clone the repository
+```bash
 git clone https://github.com/ManikantaSarma45/phishing-website.git
 cd phishing-website
+```
 
 Create virtual environment
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
 Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
 ## Running the Application
 Start the FastAPI server
+```bash
 uvicorn backend.app.app:app --reload
+```
 
 Access API documentation
+```bash
 http://127.0.0.1:8000/docs
+```
 
 ## Frontend
 Open the frontend manually
+
 open frontend/index.html
 
 ## API Usage
 Endpoint
 POST /predict
 
+```
 Request
 {
   "url": "http://example.com"
 }
+```
 
 Response
+```
 {
   "url": "http://example.com",
   "prediction": 0
 }
+```
 
 ## Docker
 Build Docker image
+```bash
 docker build -t phishing-detector .
+```
 
 Run container
+```bash
 docker run -p 8000:8000 phishing-detector
+```
 
 Access API
+```bash
 http://localhost:8000/docs
+```
 
 ## Machine Learning Pipeline
 Run the complete pipeline
+```bash
 python backend/pipeline/pipeline.py
+```
 
 ## Logging
 Logs are stored in
+```bash
 backend/logs/app.log
+```
 
 ## CI/CD
 GitHub Actions workflow installs dependencies, validates code, and builds Docker image automatically.
