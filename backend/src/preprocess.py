@@ -36,7 +36,7 @@ class Preprocessing:
             self.url = "http://" + self.url
 
         self.parsed = parse.urlparse(self.url)
-        print(self._is_valid_url())
+        # print(self._is_valid_url())
         if not self._is_valid_url():
             return None
 

@@ -2,7 +2,8 @@ import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
+
+# from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
 
 
@@ -24,8 +25,6 @@ class TrainModel:
         X = self.df.iloc[:, :-1]
         y = self.df.iloc[:, -1]
 
-        print(X.shape)
-
         self.scaler = StandardScaler()
         X_scaled = self.scaler.fit_transform(X)
 
@@ -37,7 +36,6 @@ class TrainModel:
         self.data_preprocess()
         self.model = XGBClassifier(max_depth=10)
         self.model.fit(self.X_train, self.y_train)
-        print(accuracy_score(self.y_test, self.model.predict(self.X_test)))
 
         with open("model_v1.pkl", "wb") as f:
             pickle.dump(self.model, f)

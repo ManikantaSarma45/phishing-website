@@ -18,7 +18,7 @@ class Predict:
     def predict(self, url: str):
         extractor = FeatureExtraction()
         features = extractor.extract_features(url)
-        print(features)
+        # print(features)
         if features is None:
             return -1
 
