@@ -29,7 +29,7 @@ phishing-website/
 
 ## Installation
 Clone the repository
-git clone https://github.com/YOUR_USERNAME/phishing-website.git
+git clone https://github.com/ManikantaSarma45/phishing-website.git
 cd phishing-website
 
 Create virtual environment
