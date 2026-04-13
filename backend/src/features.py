@@ -3,18 +3,22 @@ from contextlib import redirect_stdout
 from cryptography import x509
 from datetime import datetime, timezone
 import tldextract
-from tranco import Tranco
 from urllib import parse
+import pandas as pd
 import ipaddress
 import math
 import os
-import pandas as pd
 import requests
 import socket
 import ssl
 import whois
 
-DATA_PATH = os.path.join("backend", "data")
+from backend.src.data_loader import (
+    load_hosting_websites,
+    load_url_shorteners,
+    load_tranco_websites,
+)
+from backend.src.utils import logger
 
 
 class FeatureExtraction:
@@ -24,13 +28,9 @@ class FeatureExtraction:
         self.extracted = None
         self.creation_dt = None
         self.expiry_dt = None
-        self.url_shorteners = set(pd.read_csv(f"{DATA_PATH}/url_shorteners.csv").url)
-        self.hosting_websites = set(
-            pd.read_csv(f"{DATA_PATH}/hosting_websites.csv").domain
-        )
-        self.top_1m_domains = set(
-            Tranco(cache=True, cache_dir=".tranco").list().top(1000000)
-        )
+        self.url_shorteners = load_url_shorteners()
+        self.hosting_websites = load_hosting_websites()
+        self.top_1m_domains = load_tranco_websites()
 
     def _shannon_entropy(self, s: str) -> float:
         if not s:
@@ -303,40 +303,43 @@ class FeatureExtraction:
             except Exception:
                 pass
 
-        url_features = []
+        url_features = {
+            "url_length": self.url_length(),
+            "domain_length": self.domain_length(),
+            "path_length": self.path_length(),
+            "path_depth": self.path_depth(),
+            "num_subdomains": self.num_subdomains(),
+            "num_queries": self.num_queries(),
+            "url_entropy": self.url_entropy(),
+            "domain_entropy": self.domain_entropy(),
+            "path_entropy": self.path_entropy(),
+            "url_digit_ratio": self.url_digit_ratio(url),
+            "domain_digit_ratio": self.domain_digit_ratio(url),
+            "path_digit_ratio": self.path_digit_ratio(url),
+            "dot_count": self.dot_count(),
+            "at_count": self.at_count(),
+            "dollar_count": self.dollar_count(),
+            "underscore_count": self.underscore_count(),
+            "dash_count": self.dash_count(),
+            "question_mark_count": self.question_mark_count(),
+            "percent_count": self.percent_count(),
+            "ampersand_count": self.ampersand_count(),
+            "hash_count": self.hash_count(),
+            "has_ip": self.has_ip(),
+            # "https": self.https(),  # include if you use it
+            "num_redirects": self.num_redirects(),
+            "creation_days": self.creation_days(),
+            "expiry_days": self.expiry_days(),
+            "ssl_expiry": self.ssl_expiry(),
+            "has_port_in_url": self.has_port_in_url(),
+            "non_standard_port": self.non_standard_port(),
+            "shortened_url": self.shortened_url(),
+            "hosted_website": self.hosted_website(),
+            "punycode": self.punycode(),
+            "tranco_indexed": self.tranco_indexed(),
+        }
 
-        url_features.append(self.url_length())
-        url_features.append(self.domain_length())
-        url_features.append(self.path_length())
-        url_features.append(self.path_depth())
-        url_features.append(self.num_subdomains())
-        url_features.append(self.num_queries())
-        url_features.append(self.url_entropy())
-        url_features.append(self.domain_entropy())
-        url_features.append(self.path_entropy())
-        url_features.append(self.url_digit_ratio(url))
-        url_features.append(self.domain_digit_ratio(url))
-        url_features.append(self.path_digit_ratio(url))
-        url_features.append(self.dot_count())
-        url_features.append(self.at_count())
-        url_features.append(self.dollar_count())
-        url_features.append(self.underscore_count())
-        url_features.append(self.dash_count())
-        url_features.append(self.question_mark_count())
-        url_features.append(self.percent_count())
-        url_features.append(self.ampersand_count())
-        url_features.append(self.hash_count())
-        url_features.append(self.has_ip())
-        # url_features.append(self.https())
-        url_features.append(self.num_redirects())
-        url_features.append(self.creation_days())
-        url_features.append(self.expiry_days())
-        url_features.append(self.ssl_expiry())
-        url_features.append(self.has_port_in_url())
-        url_features.append(self.non_standard_port())
-        url_features.append(self.shortened_url())
-        url_features.append(self.hosted_website())
-        url_features.append(self.punycode())
-        url_features.append(self.tranco_indexed())
+        features = pd.DataFrame([url_features], index=None)
+        logger.info(f"Features of URL:\n{features.values}")
 
-        return url_features
+        return features

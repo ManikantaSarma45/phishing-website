@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.schema import URLInput
-from backend.src.predict import Predict
+from backend.src.predict import predict_url
 from backend.src.utils import logger
 
 # create app
@@ -28,7 +28,7 @@ def home():
 def predict(data: URLInput):
     try:
         logger.info(f"Received URL: {data.url}")
-        result = int(Predict().predict(data.url))
+        result = int(predict_url(data.url))
         logger.info(f"Prediction Results: {result}")
 
         return {"url": data.url, "prediction": result}

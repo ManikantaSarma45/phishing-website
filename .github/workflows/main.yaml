@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 🐍 Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # 🔧 Fix PYTHONPATH
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/backend" >> $GITHUB_ENV
+
+      # 📦 Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 🔁 Run ML Pipeline
+      - name: Run ML Pipeline
+        run: |
+          python backend/pipeline/pipeline.py
+
+      # ✅ Check model exists
+      - name: Verify model file
+        run: |
+          if [ ! -f backend/models/model_v1.pkl ]; then
+            echo "Model file missing!"
+            exit 1
+          fi
+
+      # 🐳 Build Docker image
+      - name: Build Docker
+        run: |
+          docker build -t phishing-api .
+
+      # 🚀 Run container
+      - name: Run container
+        run: |
+          docker run -d -p 8000:8000 phishing-api
+
+      # ⏳ Wait for API to start (THIS is where your loop goes)
+      - name: Wait for API
+        run: |
+          for i in {1..10}; do
+            if curl -s http://localhost:8000/docs > /dev/null; then
+              echo "API is up"
+              break
+            fi
+            sleep 2
+          done
+
+      # 🔍 Test API
+      - name: Test API
+        run: |
+          curl -f -X POST http://localhost:8000/predict \
+          -H "Content-Type: application/json" \
+          -d '{"url_length":50,"num_special_chars":2,"has_https":1}'

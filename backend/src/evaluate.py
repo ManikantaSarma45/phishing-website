@@ -1,17 +1,12 @@
-import pandas as pd
-import pickle
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
-from backend.src.utils import logger
-import os
-
-MODEL_PATH = os.path.join("backend", "models")
-DATA_PATH = os.path.join("backend", "data")
+from backend.src.utils import logger, load_model, load_scaler
+from backend.src.data_loader import load_model_training_dataset
 
 
 class Evaluate:
     def __init__(self):
-        self.df = pd.read_csv(f"{DATA_PATH}/final_merged_dataset.csv")
+        self.df = load_model_training_dataset()
         self.df = self.df.drop_duplicates()
 
     def data_preprocess(self):
@@ -26,11 +21,8 @@ class Evaluate:
         y = self.df.iloc[:, -1]
 
         # Load model + scaler
-        with open(f"{MODEL_PATH}/scaler_v1.pkl", "rb") as f:
-            self.scaler = pickle.load(f)
-
-        with open(f"{MODEL_PATH}/model_v1.pkl", "rb") as f:
-            self.model = pickle.load(f)
+        self.model = load_model()
+        self.scaler = load_scaler()
 
         # Scale
         X_scaled = self.scaler.transform(X)

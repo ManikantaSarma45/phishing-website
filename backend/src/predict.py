@@ -1,32 +1,22 @@
-import pickle
-import numpy as np
-import os
-from backend.src.preprocess import Preprocessing
 from backend.src.features import FeatureExtraction
+from backend.src.preprocess import preprocess
+from backend.src.utils import load_model, load_scaler, logger
 
-MODEL_PATH = os.path.join("backend", "models")
-DATA_PATH = os.path.join("backend", "data")
 
+def predict_url(url: str):
+    model = load_model()
+    scaler = load_scaler()
 
-class Predict:
-    def __init__(self):
-        with open(f"{MODEL_PATH}/model_v1.pkl", "rb") as f:
-            self.model = pickle.load(f)
+    url = preprocess(url)
+    extractor = FeatureExtraction()
+    features = extractor.extract_features(url)
+    # print(features)
+    if features is None:
+        return -1
 
-        with open(f"{MODEL_PATH}/scaler_v1.pkl", "rb") as f:
-            self.scaler = pickle.load(f)
+    X_scaled = scaler.transform(features)
+    logger.info(f"Scaled Features:\n{X_scaled}")
+    prediction = model.predict(X_scaled)[0]
 
-    def predict(self, url: str):
-        preprocess = Preprocessing()
-        extractor = FeatureExtraction()
-        url = preprocess.preprocess(url)
-        features = extractor.extract_features(url)
-        # print(features)
-        if features is None:
-            return -1
-
-        features = np.array(features).reshape(1, -1)
-        X_scaled = self.scaler.transform(features)
-        prediction = self.model.predict(X_scaled)[0]
-
-        return prediction
+    logger.info(f"Predicted: {'Legit' if prediction == 0 else 'Phishing'}")
+    return prediction

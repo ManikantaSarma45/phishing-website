@@ -2,42 +2,38 @@ from urllib import parse
 import ipaddress
 
 
-class Preprocessing:
-    def __init__(self):
-        self.url = None
-        self.parsed = None
-
-    def _is_valid_url(self) -> bool:
-        if not self.parsed.hostname:
-            return False
-
-        try:
-            if ipaddress.ip_address(self.parsed.hostname):
-                return True
-
-        except ValueError:
-            pass
-
-        if "@" in self.parsed.netloc:
-            return False
-
-        if "." in self.parsed.hostname:
-            return True
+def is_valid_url(parsed: parse.ParseResult) -> bool:
+    if not parsed.hostname:
         return False
 
-    def preprocess(self, url: str) -> str:
-        self.url = url
-        self.url = self.url.strip().lower()
-        self.url = parse.unquote(self.url)
+    try:
+        if ipaddress.ip_address(parsed.hostname):
+            return True
 
-        if self.url.startswith("//"):
-            self.url = "http:" + self.url
-        if not self.url.startswith(("http://", "https://")):
-            self.url = "http://" + self.url
+    except ValueError:
+        pass
 
-        self.parsed = parse.urlparse(self.url)
-        # print(self._is_valid_url())
-        if not self._is_valid_url():
-            return None
+    if "@" in parsed.netloc:
+        return False
 
-        return self.url
+    if "." in parsed.hostname:
+        return True
+    return False
+
+
+def preprocess(url: str) -> str:
+    url = url
+    url = url.strip().lower()
+    url = parse.unquote(url)
+
+    if url.startswith("//"):
+        url = "http:" + url
+    if not url.startswith(("http://", "https://")):
+        url = "http://" + url
+
+    parsed = parse.urlparse(url)
+    # print(is_valid_url())
+    if not is_valid_url(parsed):
+        return None
+
+    return url
