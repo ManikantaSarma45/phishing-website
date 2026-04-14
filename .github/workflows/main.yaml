@@ -66,6 +66,8 @@ jobs:
       # 🔍 Test API
       - name: Test API
         run: |
+          uvicorn backend.app.app:app --host 0.0.0.0 --port 8000 &
+          sleep 5
           curl -f -X POST http://localhost:8000/predict \
-          -H "Content-Type: application/json" \
-          -d '{"url_length":50,"num_special_chars":2,"has_https":1}'
+            -H "Content-Type: application/json" \
+            -d '{"url": "http://google.com"}'
