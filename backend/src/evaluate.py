@@ -15,6 +15,9 @@ class Evaluate:
 
         if "https" in self.df.columns:
             self.df = self.df.drop(columns=["https"])
+            
+        if "tranco_indexed" in self.df.columns:
+            self.df = self.df.drop(columns=["tranco_indexed"])
 
         # Split
         X = self.df.iloc[:, :-1]
@@ -22,6 +25,8 @@ class Evaluate:
 
         # Load model + scaler
         self.model = load_model()
+
+        # X = X[self.model.feature_names_in_]
         self.scaler = load_scaler()
 
         # Scale
@@ -29,12 +34,15 @@ class Evaluate:
 
         # Split
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            X_scaled, y, test_size=0.2, random_state=64, shuffle=True
+            X_scaled , y, test_size=0.2, random_state=64, shuffle=True
         )
+
+
 
     # Predict
     def evaluate_model(self):
         self.data_preprocess()
+        
         y_pred = self.model.predict(self.X_test)
 
         # Metrics

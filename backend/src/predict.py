@@ -16,6 +16,7 @@ def predict_url(url: str):
 
     X_scaled = scaler.transform(features)
     logger.info(f"Scaled Features:\n{X_scaled}")
+    # features = features[model.feature_names_in_]
     prediction = model.predict(X_scaled)[0]
 
     logger.info(f"Predicted: {'Legit' if prediction == 0 else 'Phishing'}")
