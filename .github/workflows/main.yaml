@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 📥 Checkout code
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -34,7 +35,7 @@ jobs:
         run: |
           python backend/pipeline/pipeline.py
 
-      # ✅ Check model exists
+      # ✅ Verify model exists
       - name: Verify model file
         run: |
           if [ ! -f backend/models/model_v1.pkl ]; then
@@ -42,17 +43,29 @@ jobs:
             exit 1
           fi
 
-      # 🐳 Build Docker image
-      - name: Build Docker
-        run: |
-          docker build -t phishing-api .
+      # 🔐 Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 🚀 Run container
+      # 🐳 Build and Push Docker Image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/phishing-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/phishing-api:${{ github.sha }}
+
+      # 🚀 Run container (for testing)
       - name: Run container
         run: |
-          docker run -d -p 8000:8000 phishing-api
+          docker run -d -p 8000:8000 ${{ secrets.DOCKERHUB_USERNAME }}/phishing-api:latest
 
-      # ⏳ Wait for API to start (THIS is where your loop goes)
+      # ⏳ Wait for API
       - name: Wait for API
         run: |
           for i in {1..10}; do
@@ -66,8 +79,6 @@ jobs:
       # 🔍 Test API
       - name: Test API
         run: |
-          uvicorn backend.app.app:app --host 0.0.0.0 --port 8000 &
-          sleep 5
           curl -f -X POST http://localhost:8000/predict \
             -H "Content-Type: application/json" \
             -d '{"url": "http://google.com"}'
