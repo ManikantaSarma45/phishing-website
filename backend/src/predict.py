@@ -18,6 +18,12 @@ def predict_url(url: str):
     logger.info(f"Scaled Features:\n{X_scaled}")
     # features = features[model.feature_names_in_]
     prediction = model.predict(X_scaled)[0]
+    score = model.predict_proba(X_scaled)[0][1]
+    if score < 0.5:
+        score = (1 - score * 2) * 100
+    else:
+        score = ((score - 0.5) * 2) * 100
 
     logger.info(f"Predicted: {'Legit' if prediction == 0 else 'Phishing'}")
-    return prediction
+    logger.info(f"Confidence Score: {score: .2f}%")
+    return prediction, score

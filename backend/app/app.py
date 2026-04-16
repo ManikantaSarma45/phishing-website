@@ -28,10 +28,14 @@ def home():
 def predict(data: URLInput):
     try:
         logger.info(f"Received URL: {data.url}")
-        result = int(predict_url(data.url))
-        logger.info(f"Prediction Results: {result}")
+        prediction, score = predict_url(data.url)
+        logger.info(f"Prediction Results: {int(prediction)}, Score: {score:.2f}%")
 
-        return {"url": data.url, "prediction": result}
+        return {
+            "url": data.url,
+            "prediction": int(prediction),
+            "score": f"{score:.2f}%",
+        }
 
     except Exception as e:
         logger.error(f"Error: {str(e)}")
