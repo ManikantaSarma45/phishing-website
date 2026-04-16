@@ -81,4 +81,4 @@ jobs:
         run: |
           curl -f -X POST http://localhost:8000/predict \
             -H "Content-Type: application/json" \
-            -d '{"url": "http://google.com"}'
+            -d '{"url": "http://www.google.com/"}'

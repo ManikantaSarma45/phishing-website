@@ -8,3 +8,4 @@ backend/logs/app.log
 .DS_Store
 .tranco/
 libomp.tar.xz
+*.pem
